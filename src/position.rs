@@ -14,6 +14,8 @@ impl Position {
 
 impl fmt::Display for Position {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}@{} ", self.x, self.y)
+
+        write!(f , "{}" , self.x * 7 + self.y)
+        // write!(f, "{}@{} ", self.x, self.y)
     }
 }

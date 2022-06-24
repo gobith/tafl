@@ -13,11 +13,12 @@ impl fmt::Display for Tafl {
             for y in 0..self.size {
                 let position = Position::new(x, y);
 
-                if self.castles.contains(&position) {
-                    write!(f, "{}", self.castle_tile())?;
-                } else {
-                    write!(f, "{}", self.tile())?;
-                }
+                // if self.castles.contains(&position) {
+                //     write!(f, "{}", self.castle_tile())?;
+                // } else {
+                //     write!(f, "{}", self.tile())?;
+                // }
+                write!(f, "{} ", position)?;
             }
             write!(f, "{}", '\n')?;
         }
