@@ -2,6 +2,7 @@ mod position;
 mod tafl;
 mod tests;
 mod brandubh;
+mod hnefatafl;
 
 use tafl::Tafl;
 

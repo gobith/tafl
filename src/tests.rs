@@ -31,6 +31,15 @@ mod tests {
         }
     }
 
+
+    #[test]
+    fn tfl_test_hnefatafl() {
+        use super::super::hnefatafl::Hnefatafl;
+        let tfl = Hnefatafl::new();
+        println!("{}", tfl);
+        println!("{:?}", tfl)
+    }
+
     #[test]
     fn tfl_test_brandubh() {
         use super::super::brandubh::Brandubh;
