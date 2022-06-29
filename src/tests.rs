@@ -9,12 +9,22 @@ mod tests {
         println!("{:?}", number)
     }
     #[test]
-    fn tfl_test_1() {
+    fn tfl_test_brandubh() {
         use super::super::tafl::Tafl;
-        let tfl = Tafl::from(
-            "7+24+17-23-25-31+3-10-21-22-26-27-38-45",
-        );
-        println!("{}" , tfl);
-        println!("{:?}" , tfl)
+        let tfl = Tafl::brandubh();
+        println!("{}", tfl);
+        println!("{:?}", tfl)
+    }
+
+    fn tfl_test_brandubh_loop() {
+        use super::super::tafl::Tafl;
+        let mut count = 0u32;
+        loop {
+            count += 1;
+            Tafl::brandubh();
+            if count == 3 {
+                break;
+            }
+        }
     }
 }

@@ -95,4 +95,9 @@ impl Tafl {
 
         tafl
     }
+
+    pub fn brandubh() -> Self {
+        Self::from("7+24+17-23-25-31+3-10-21-22-26-27-38-45")
+    }
+
 }
