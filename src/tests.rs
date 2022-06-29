@@ -9,20 +9,45 @@ mod tests {
         println!("{:?}", number)
     }
     #[test]
-    fn tfl_test_brandubh() {
+    fn tfl_test_brandubh_old() {
         use super::super::tafl::Tafl;
         let tfl = Tafl::brandubh();
         println!("{}", tfl);
         println!("{:?}", tfl)
     }
 
-    fn tfl_test_brandubh_loop() {
+    #[test]
+    fn tfl_test_brandubh_loop_old() {
         use super::super::tafl::Tafl;
         let mut count = 0u32;
         loop {
             count += 1;
-            Tafl::brandubh();
-            if count == 3 {
+            // Tafl::brandubh();
+            Tafl::new(7);
+            if count == 1000000 {
+                println!("done {}", count);
+                break;
+            }
+        }
+    }
+
+    #[test]
+    fn tfl_test_brandubh() {
+        use super::super::brandubh::Brandubh;
+        let tfl = Brandubh::new();
+        println!("{}", tfl);
+        println!("{:?}", tfl)
+    }
+
+    #[test]
+    fn tfl_test_brandubh_loop() {
+        use super::super::brandubh::Brandubh;
+        let mut count = 0u32;
+        loop {
+            count += 1;
+            Brandubh::new();
+            if count == 1000000 {
+                println!("done {}", count);
                 break;
             }
         }
