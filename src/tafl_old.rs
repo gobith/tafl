@@ -2,7 +2,6 @@
 use super::position::Position;
 use std::collections::HashSet;
 use std::fmt;
-use std::hash::Hash;
 
 #[derive(Debug)]
 pub struct Tafl {

@@ -102,4 +102,15 @@ mod tests {
         println!("{}", tfl_clone);
         println!("{:?}", tfl_clone)
     }
+
+
+    #[test]
+    fn tfl_test_move_piece() {
+        let tfl = crate::tafl::brandubh();
+        let tfl_new = tfl.move_piece(10 , 7);
+        let tfl_new1 = tfl_new.move_piece(17 , 10);
+        println!("{}", tfl_new1);
+        
+    }
+
 }
