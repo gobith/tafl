@@ -98,18 +98,19 @@ mod tests {
     #[test]
     fn tfl_test_tafl_hnefatafl() {
         let tfl = crate::tafl::hnefatafl();
-        let tfl_clone = tfl.clone();
-        println!("{}", tfl_clone);
-        println!("{:?}", tfl_clone)
+        println!("{}", tfl);
+        println!("{:?}", tfl)
     }
 
 
     #[test]
     fn tfl_test_move_piece() {
-        let tfl = crate::tafl::brandubh();
-        let tfl_new = tfl.move_piece(10 , 7);
-        let tfl_new1 = tfl_new.move_piece(17 , 10);
-        println!("{}", tfl_new1);
+        let mut tfl = crate::tafl::brandubh();
+        tfl.move_piece(10 , 7);
+        tfl.move_piece(17 , 10);
+        tfl.move_piece(14 , 17);
+        println!("{}", tfl);
+        println!("{:?}", tfl);
         
     }
 
