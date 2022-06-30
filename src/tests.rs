@@ -106,8 +106,11 @@ mod tests {
     #[test]
     fn tfl_test_move_piece() {
         let mut tfl = crate::tafl::brandubh();
+        println!("{}", tfl);
         tfl.move_piece(10 , 7);
+        println!("{}", tfl);
         tfl.move_piece(17 , 10);
+        println!("{}", tfl);
         tfl.move_piece(14 , 17);
         println!("{}", tfl);
         println!("{:?}", tfl);
