@@ -10,7 +10,7 @@ mod tests {
     }
     #[test]
     fn tfl_test_brandubh_old() {
-        use super::super::tafl::Tafl;
+        use super::super::tafl_old::Tafl;
         let tfl = Tafl::brandubh();
         println!("{}", tfl);
         println!("{:?}", tfl)
@@ -18,7 +18,7 @@ mod tests {
 
     #[test]
     fn tfl_test_brandubh_loop_old() {
-        use super::super::tafl::Tafl;
+        use super::super::tafl_old::Tafl;
         let mut count = 0u32;
         loop {
             count += 1;
@@ -30,7 +30,6 @@ mod tests {
             }
         }
     }
-
 
     #[test]
     fn tfl_test_hnefatafl() {
@@ -55,10 +54,52 @@ mod tests {
         loop {
             count += 1;
             Brandubh::new();
-            if count == 1000000 {
+            if count == 1000000000 {
                 println!("done {}", count);
                 break;
             }
         }
+    }
+
+    #[test]
+    fn tfl_test_hnefatafl_loop() {
+        use super::super::hnefatafl::Hnefatafl;
+        let mut count = 0u32;
+        loop {
+            count += 1;
+            Hnefatafl::new();
+            if count == 1000000000 {
+                println!("done {}", count);
+                break;
+            }
+        }
+    }
+
+    #[test]
+    fn array_equality() {
+        let array1 = [
+            4, 0, 3, 3, 3, 0, 4, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 2, 0, 0, 3, 3, 3, 2, 1, 2, 3, 3, 3,
+            0, 0, 2, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0, 4, 0, 3, 3, 3, 0, 4,
+        ];
+        let array2 = [
+            4, 0, 3, 3, 3, 0, 4, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 2, 0, 0, 3, 3, 3, 2, 1, 2, 3, 3, 3,
+            0, 0, 2, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0, 4, 0, 3, 3, 3, 0, 4,
+        ];
+        assert_eq!(array1, array2);
+    }
+
+    #[test]
+    fn tfl_test_tafl_brandubh() {
+        let tfl = crate::tafl::brandubh();
+        println!("{}", tfl);
+        println!("{:?}", tfl)
+    }
+
+    #[test]
+    fn tfl_test_tafl_hnefatafl() {
+        let tfl = crate::tafl::hnefatafl();
+        let tfl_clone = tfl.clone();
+        println!("{}", tfl_clone);
+        println!("{:?}", tfl_clone)
     }
 }

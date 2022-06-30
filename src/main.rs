@@ -1,10 +1,11 @@
 mod position;
-mod tafl;
+mod tafl_old;
 mod tests;
 mod brandubh;
 mod hnefatafl;
+mod tafl;
 
-use tafl::Tafl;
+use tafl_old::Tafl;
 
 fn main() {
     let board = Tafl::new(7);

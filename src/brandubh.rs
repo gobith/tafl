@@ -3,7 +3,7 @@ use std::fmt;
 #[derive(Debug)]
 pub struct Brandubh {
     size: usize,
-    board: [u8; 49],
+    board: [u32; 49],
 }
 
 impl Brandubh {
