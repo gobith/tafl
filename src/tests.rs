@@ -116,5 +116,12 @@ mod tests {
         println!("{:?}", tfl);
         
     }
+    #[test]
+    fn tfl_test_move_wrong_piece() {
+        let mut tfl = crate::tafl::brandubh();
+        tfl.move_piece(24 , 23);
+       
+        
+    }
 
 }
