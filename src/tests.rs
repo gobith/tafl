@@ -124,4 +124,21 @@ mod tests {
         
     }
 
+    #[test]
+    fn tfl_test_move_piece_up() {
+        let mut tfl = crate::tafl::brandubh();
+        tfl.move_piece(46, 39);
+       
+        
+    }
+
+    #[test]
+    fn tfl_test_move_piece_up_error() {
+        let mut tfl = crate::tafl::brandubh();
+        tfl.move_piece(46, 11);
+       
+        
+    }
+
+
 }

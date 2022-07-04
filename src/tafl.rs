@@ -1,3 +1,4 @@
+use std::cmp::Ordering;
 use std::fmt;
 
 #[derive(Debug)]
@@ -9,12 +10,14 @@ pub struct Tafl<const N: usize> {
 #[derive(Clone, Copy, Debug)]
 struct State<const N: usize> {
     side: usize,
+    row_size: usize,
     board: [u32; N],
 }
 
 pub fn hnefatafl() -> Tafl<121> {
     let state = State {
         side: 1,
+        row_size: 11,
         board: [
             4, 0, 0, 1, 1, 1, 1, 1, 0, 0, 4, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 1, 0, 0, 0, 2, 2, 2, 0, 0, 0, 1, 1, 1, 0,
@@ -34,14 +37,10 @@ pub fn hnefatafl() -> Tafl<121> {
 pub fn brandubh() -> Tafl<49> {
     let state = State {
         side: 1,
+        row_size: 7,
         board: [
-            4, 0, 1, 1, 1, 0, 4, 
-            0, 0, 0, 1, 0, 0, 0, 
-            1, 0, 0, 2, 0, 0, 1, 
-            1, 1, 2, 3, 2, 1, 1, 
-            1, 0, 0, 2, 0, 0, 1, 
-            0, 0, 0, 1, 0, 0, 0, 
-            4, 0, 1, 1, 1, 0, 4,
+            4, 0, 1, 1, 1, 0, 4, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2, 0, 0, 1, 1, 1, 2, 3, 2, 1, 1, 1,
+            0, 0, 2, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 4, 0, 1, 1, 1, 0, 4,
         ],
     };
     Tafl {
@@ -109,7 +108,48 @@ impl<const N: usize> State<N> {
         }
     }
 
-    fn validate_move(&self, start_idx: usize, end_idx: usize) -> Result<(), ()> {
+    fn validate_move(&self, start_idx: usize, end_idx: usize) -> Result<(), String> {
+        if self.board[end_idx] != 0 {
+            return Err("End Tile is occupied".to_string());
+        };
+
+        let start_row = start_idx / self.row_size;
+        let end_row = end_idx / self.row_size;
+        let start_column = start_idx % self.row_size;
+        let end_column = end_idx % self.row_size;
+
+        println!("Start_row {}", start_row);
+        println!("End_row {}", end_row);
+        println!("Start_column {}", start_column);
+        println!("End_column {}", end_column);
+
+        match start_row.cmp(&end_row) {
+            Ordering::Less => {
+                // End row greater than Start row
+                if start_column != end_column {
+                    return Err("Start end End Should be on the same Row or Column".to_string());
+                };
+                for n in 1..start_row - end_row {
+                    if self.board[start_idx + (n * self.row_size)] != 0 {
+                        return Err("Cannot move piece throught another piece".to_string());
+                    };
+                }
+            }
+            Ordering::Greater => {
+                // Start row greater than End row
+                if start_column != end_column {
+                    return Err("Start end End Should be on the same Row or Column".to_string());
+                };
+
+                for n in 1..start_row - end_row {
+                    if self.board[start_idx - (n * self.row_size)] != 0 {
+                        return Err("Cannot move piece throught another piece".to_string());
+                    };
+                }
+            }
+            Ordering::Equal => {}
+        }
+
         Ok(())
     }
 
@@ -127,7 +167,7 @@ impl<const N: usize> State<N> {
                 0 => StateResult::ErrorState("Nothing on start position".to_string()),
                 1 => match self.validate_move(start_idx, end_idx) {
                     Ok(_) => StateResult::NextState(clone),
-                    Err(_) => StateResult::ErrorState("Illegal Move".to_string()),
+                    Err(str) => StateResult::ErrorState("Illegal Move: ".to_string() + &str),
                 },
                 2 => StateResult::ErrorState("Attacker cannot move Defender".to_string()),
                 3 => StateResult::ErrorState("Attacker cannot move King".to_string()),
