@@ -84,13 +84,10 @@ impl<const N: usize> fmt::Display for Tafl<N> {
 impl<const N: usize> Tafl<N> {
     pub fn move_piece(&mut self, start_idx: usize, end_idx: usize) -> () {
         match self.state.move_piece(start_idx, end_idx) {
-            StateResult::NextState(mut new_state) => {
+            StateResult::ValidState(mut new_state) => {
                 new_state.switch_side();
                 self.history.push(self.state);
                 self.state = new_state;
-            }
-            StateResult::WinState(new_state, winner) => {
-                println!("winner is {}", winner)
             }
             StateResult::ErrorState(error_string) => {
                 println!("Error {}", error_string)
@@ -118,6 +115,8 @@ impl<const N: usize> State<N> {
         let start_column = start_idx % self.row_size;
         let end_column = end_idx % self.row_size;
 
+        println!("Start_idx {}", start_idx);
+        println!("End_idx {}", end_idx);
         println!("Start_row {}", start_row);
         println!("End_row {}", end_row);
         println!("Start_column {}", start_column);
@@ -129,7 +128,7 @@ impl<const N: usize> State<N> {
                 if start_column != end_column {
                     return Err("Start end End Should be on the same Row or Column".to_string());
                 };
-                for n in 1..start_row - end_row {
+                for n in 1..end_row - start_row {
                     if self.board[start_idx + (n * self.row_size)] != 0 {
                         return Err("Cannot move piece throught another piece".to_string());
                     };
@@ -147,7 +146,23 @@ impl<const N: usize> State<N> {
                     };
                 }
             }
-            Ordering::Equal => {}
+            Ordering::Equal => {
+                if start_idx < end_idx {
+                    for n in start_idx + 1..end_idx {
+                        println!("Index from Start is {}", n);
+                        if self.board[n] != 0 {
+                            return Err("Cannot move piece throught another piece".to_string());
+                        };
+                    }
+                } else {
+                    for n in end_idx + 1..start_idx {
+                        println!("Index from End is {}", n);
+                        if self.board[n] != 0 {
+                            return Err("Cannot move piece throught another piece".to_string());
+                        };
+                    }
+                }
+            }
         }
 
         Ok(())
@@ -166,7 +181,7 @@ impl<const N: usize> State<N> {
                 // Attacker
                 0 => StateResult::ErrorState("Nothing on start position".to_string()),
                 1 => match self.validate_move(start_idx, end_idx) {
-                    Ok(_) => StateResult::NextState(clone),
+                    Ok(_) => StateResult::ValidState(clone),
                     Err(str) => StateResult::ErrorState("Illegal Move: ".to_string() + &str),
                 },
                 2 => StateResult::ErrorState("Attacker cannot move Defender".to_string()),
@@ -180,11 +195,11 @@ impl<const N: usize> State<N> {
                 0 => StateResult::ErrorState("Nothing on start position".to_string()),
                 1 => StateResult::ErrorState("Defender cannot move Attacker".to_string()),
                 2 => match self.validate_move(start_idx, end_idx) {
-                    Ok(_) => StateResult::NextState(clone),
+                    Ok(_) => StateResult::ValidState(clone),
                     Err(_) => StateResult::ErrorState("Illegal Move".to_string()),
                 },
                 3 => match self.validate_move(start_idx, end_idx) {
-                    Ok(_) => StateResult::NextState(clone),
+                    Ok(_) => StateResult::ValidState(clone),
                     Err(_) => StateResult::ErrorState("Illegal Move".to_string()),
                 },
                 4 => StateResult::ErrorState("Cannot move from Castle".to_string()),
@@ -195,7 +210,6 @@ impl<const N: usize> State<N> {
 }
 
 enum StateResult<T> {
-    NextState(T),
-    WinState(T, usize),
+    ValidState(T),
     ErrorState(String),
 }
