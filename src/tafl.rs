@@ -84,12 +84,12 @@ impl<const N: usize> fmt::Display for Tafl<N> {
 impl<const N: usize> Tafl<N> {
     pub fn move_piece(&mut self, start_idx: usize, end_idx: usize) -> () {
         match self.state.move_piece(start_idx, end_idx) {
-            StateResult::ValidState(mut new_state) => {
+            Ok(mut new_state) => {
                 new_state.switch_side();
                 self.history.push(self.state);
                 self.state = new_state;
             }
-            StateResult::ErrorState(error_string) => {
+            Err(error_string) => {
                 println!("Error {}", error_string)
             }
         }
@@ -168,7 +168,7 @@ impl<const N: usize> State<N> {
         Ok(())
     }
 
-    fn move_piece(&self, start_idx: usize, end_idx: usize) -> StateResult<State<N>> {
+    fn move_piece(&self, start_idx: usize, end_idx: usize) -> Result<State<N> , String> {
         let start = self.board[start_idx];
         // let end = self.board[end_idx];
 
@@ -179,37 +179,34 @@ impl<const N: usize> State<N> {
         if self.side == 1 {
             match start {
                 // Attacker
-                0 => StateResult::ErrorState("Nothing on start position".to_string()),
+                0 => Err("Nothing on start position".to_string()),
                 1 => match self.validate_move(start_idx, end_idx) {
-                    Ok(_) => StateResult::ValidState(clone),
-                    Err(str) => StateResult::ErrorState("Illegal Move: ".to_string() + &str),
+                    Ok(_) => Ok(clone),
+                    Err(str) => Err("Illegal Move: ".to_string() + &str),
                 },
-                2 => StateResult::ErrorState("Attacker cannot move Defender".to_string()),
-                3 => StateResult::ErrorState("Attacker cannot move King".to_string()),
-                4 => StateResult::ErrorState("Cannot move from Castle".to_string()),
+                2 => Err("Attacker cannot move Defender".to_string()),
+                3 => Err("Attacker cannot move King".to_string()),
+                4 => Err("Cannot move from Castle".to_string()),
                 _ => panic!("No such number"),
             }
         } else {
             match start {
                 // Defender
-                0 => StateResult::ErrorState("Nothing on start position".to_string()),
-                1 => StateResult::ErrorState("Defender cannot move Attacker".to_string()),
+                0 => Err("Nothing on start position".to_string()),
+                1 => Err("Defender cannot move Attacker".to_string()),
                 2 => match self.validate_move(start_idx, end_idx) {
-                    Ok(_) => StateResult::ValidState(clone),
-                    Err(_) => StateResult::ErrorState("Illegal Move".to_string()),
+                    Ok(_) => Ok(clone),
+                    Err(_) => Err("Illegal Move".to_string()),
                 },
                 3 => match self.validate_move(start_idx, end_idx) {
-                    Ok(_) => StateResult::ValidState(clone),
-                    Err(_) => StateResult::ErrorState("Illegal Move".to_string()),
+                    Ok(_) => Ok(clone),
+                    Err(_) => Err("Illegal Move".to_string()),
                 },
-                4 => StateResult::ErrorState("Cannot move from Castle".to_string()),
+                4 => Err("Cannot move from Castle".to_string()),
                 _ => panic!("No such number"),
             }
         }
     }
 }
 
-enum StateResult<T> {
-    ValidState(T),
-    ErrorState(String),
-}
+
