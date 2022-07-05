@@ -105,6 +105,41 @@ impl<const N: usize> State<N> {
         }
     }
 
+    fn move_piece(&self, start_idx: usize, end_idx: usize) -> Result<State<N>, String> {
+        let start = self.board[start_idx];
+
+        if self.side == 1 {
+            match start {
+                // Attacker
+                0 => Err("Nothing on start position".to_string()),
+                1 => match self.validate_move(start_idx, end_idx) {
+                    Ok(_) => Ok(self.next_state(start_idx, end_idx)),
+                    Err(str) => Err("Illegal Move: ".to_string() + &str),
+                },
+                2 => Err("Attacker cannot move Defender".to_string()),
+                3 => Err("Attacker cannot move King".to_string()),
+                4 => Err("Cannot move from Castle".to_string()),
+                _ => panic!("No such number"),
+            }
+        } else {
+            match start {
+                // Defender
+                0 => Err("Nothing on start position".to_string()),
+                1 => Err("Defender cannot move Attacker".to_string()),
+                2 => match self.validate_move(start_idx, end_idx) {
+                    Ok(_) => Ok(self.next_state(start_idx, end_idx)),
+                    Err(_) => Err("Illegal Move".to_string()),
+                },
+                3 => match self.validate_move(start_idx, end_idx) {
+                    Ok(_) => Ok(self.next_state(start_idx, end_idx)),
+                    Err(_) => Err("Illegal Move".to_string()),
+                },
+                4 => Err("Cannot move from Castle".to_string()),
+                _ => panic!("No such number"),
+            }
+        }
+    }
+
     fn validate_move(&self, start_idx: usize, end_idx: usize) -> Result<(), String> {
         if self.board[end_idx] != 0 {
             return Err("End Tile is occupied".to_string());
@@ -130,7 +165,7 @@ impl<const N: usize> State<N> {
                 };
                 for n in 1..end_row - start_row {
                     if self.board[start_idx + (n * self.row_size)] != 0 {
-                        return Err("Cannot move piece throught another piece".to_string());
+                        return Err("Cannot move piece through another piece".to_string());
                     };
                 }
             }
@@ -142,7 +177,7 @@ impl<const N: usize> State<N> {
 
                 for n in 1..start_row - end_row {
                     if self.board[start_idx - (n * self.row_size)] != 0 {
-                        return Err("Cannot move piece throught another piece".to_string());
+                        return Err("Cannot move piece through another piece".to_string());
                     };
                 }
             }
@@ -151,7 +186,7 @@ impl<const N: usize> State<N> {
                     for n in start_idx + 1..end_idx {
                         println!("Index from Start is {}", n);
                         if self.board[n] != 0 {
-                            return Err("Cannot move piece throught another piece".to_string());
+                            return Err("Cannot move piece through another piece".to_string());
                         };
                     }
                 } else {
@@ -168,45 +203,56 @@ impl<const N: usize> State<N> {
         Ok(())
     }
 
-    fn move_piece(&self, start_idx: usize, end_idx: usize) -> Result<State<N> , String> {
+    fn next_state(&self, start_idx: usize, end_idx: usize) -> State<N> {
         let start = self.board[start_idx];
-        // let end = self.board[end_idx];
-
         let mut clone = self.clone();
         clone.board[end_idx] = start;
         clone.board[start_idx] = 0;
 
-        if self.side == 1 {
-            match start {
-                // Attacker
-                0 => Err("Nothing on start position".to_string()),
-                1 => match self.validate_move(start_idx, end_idx) {
-                    Ok(_) => Ok(clone),
-                    Err(str) => Err("Illegal Move: ".to_string() + &str),
-                },
-                2 => Err("Attacker cannot move Defender".to_string()),
-                3 => Err("Attacker cannot move King".to_string()),
-                4 => Err("Cannot move from Castle".to_string()),
-                _ => panic!("No such number"),
+        let end_row = end_idx / self.row_size;
+
+        //left
+        let index = end_idx - 2;
+        if index > 0 && index / self.row_size == end_row {
+            if self.is_same_side(clone.board[index])
+                && self.is_opposite_side(clone.board[index + 1])
+            {
+                clone.board[index + 1] = 0;
+            };
+        };
+
+        //right
+        let index = end_idx + 2;
+
+        if index < self.row_size * self.row_size && index / self.row_size == end_row {
+            if self.is_same_side(clone.board[index])
+                && self.is_opposite_side(clone.board[index - 1])
+            {
+                clone.board[index - 1] = 0;
             }
-        } else {
-            match start {
-                // Defender
-                0 => Err("Nothing on start position".to_string()),
-                1 => Err("Defender cannot move Attacker".to_string()),
-                2 => match self.validate_move(start_idx, end_idx) {
-                    Ok(_) => Ok(clone),
-                    Err(_) => Err("Illegal Move".to_string()),
-                },
-                3 => match self.validate_move(start_idx, end_idx) {
-                    Ok(_) => Ok(clone),
-                    Err(_) => Err("Illegal Move".to_string()),
-                },
-                4 => Err("Cannot move from Castle".to_string()),
-                _ => panic!("No such number"),
-            }
+        };
+
+        //up
+        //down
+
+        clone
+    }
+
+    fn is_same_side(&self, piece: u32) -> bool {
+        match piece {
+            1 => self.side == 1,
+            2 => self.side == 2,
+            3 => self.side == 2,
+            _ => false,
+        }
+    }
+
+    fn is_opposite_side(&self, piece: u32) -> bool {
+        match piece {
+            1 => self.side != 1,
+            2 => self.side != 2,
+            3 => self.side != 2,
+            _ => false,
         }
     }
 }
-
-

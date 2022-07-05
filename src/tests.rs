@@ -1,6 +1,8 @@
 #[cfg(test)]
 
 mod tests {
+    use super::test_move;
+
     #[test]
     fn tfl_test() {
         let tfl = "7+24+11-17-22-23-25-36-31-38+2-3-4-10-14-20-21-22-26-27-28-34-38-44-45-46";
@@ -116,6 +118,35 @@ mod tests {
         println!("{:?}", tfl);
         
     }
+    
+    #[test]
+    fn tfl_test_move_piece_capture_left() {
+        let mut tfl = crate::tafl::brandubh();
+        println!("{}", tfl);
+        tfl.move_piece(14 , 16);
+        println!("{}", tfl);
+        tfl.move_piece(31 , 32);
+        println!("{}", tfl);
+        tfl.move_piece(20 , 18);
+        println!("{}", tfl);
+        println!("{:?}", tfl);
+        
+    }
+
+    #[test]
+    fn tfl_test_move_piece_capture_right() {
+        let mut tfl = crate::tafl::brandubh();
+        println!("{}", tfl);
+        tfl.move_piece(34 , 32);
+        println!("{}", tfl);
+        tfl.move_piece(17 , 18);
+        println!("{}", tfl);
+        tfl.move_piece(28 , 30);
+        println!("{}", tfl);
+        println!("{:?}", tfl);
+        
+    }
+
     #[test]
     fn tfl_test_move_wrong_piece() {
         let mut tfl = crate::tafl::brandubh();
