@@ -10,7 +10,7 @@ pub struct Tafl<const N: usize> {
 
 #[derive(Clone, Copy, Debug)]
 struct State<const N: usize> {
-    side: usize,
+    side: Side,
     row_size: usize,
     board: [Tile; N],
 }
@@ -18,7 +18,7 @@ struct State<const N: usize> {
 pub fn hnefatafl() -> Tafl<121> {
     use Tile::*;
     let state = State {
-        side: 1,
+        side: Side::Attacker,
         row_size: 11,
         board: [
             Castle, Empty, Empty, Attacker, Attacker, Attacker, Attacker, Attacker, Empty, Empty,
@@ -46,16 +46,14 @@ pub fn hnefatafl() -> Tafl<121> {
 pub fn brandubh() -> Tafl<49> {
     use Tile::*;
     let state = State {
-        side: 1,
+        side: Side::Attacker,
         row_size: 7,
         board: [
-            Castle,     Empty,      Attacker,   Attacker,   Attacker,   Empty ,     Castle,
-            Empty,      Empty,      Empty,      Attacker,   Empty,      Empty,      Empty, 
-            Attacker,   Empty,      Empty,      Defender,   Empty,      Empty,      Attacker, 
-            Attacker,   Attacker,   Defender,   King,       Defender,   Attacker,   Attacker, 
-            Attacker,   Empty,      Empty,      Defender,   Empty,      Empty,      Attacker, 
-            Empty,      Empty,      Empty,      Attacker,   Empty,      Empty,      Empty, 
-            Castle,     Empty,      Attacker,   Attacker,   Attacker,   Empty,      Castle,
+            Castle, Empty, Attacker, Attacker, Attacker, Empty, Castle, Empty, Empty, Empty,
+            Attacker, Empty, Empty, Empty, Attacker, Empty, Empty, Defender, Empty, Empty,
+            Attacker, Attacker, Attacker, Defender, King, Defender, Attacker, Attacker, Attacker,
+            Empty, Empty, Defender, Empty, Empty, Attacker, Empty, Empty, Empty, Attacker, Empty,
+            Empty, Empty, Castle, Empty, Attacker, Attacker, Attacker, Empty, Castle,
         ],
     };
     Tafl {
@@ -77,7 +75,7 @@ impl<const N: usize> fmt::Display for Tafl<N> {
                     Tile::Defender => '⭕',
                     Tile::King => '⬤',
                     Tile::Castle => '⬛',
-                    Tile::CastleWithKing => '⬤'
+                    Tile::CastleWithKing => '⬤',
                 };
                 write!(f, "{} {}", char, '\t')?;
             }
@@ -85,9 +83,8 @@ impl<const N: usize> fmt::Display for Tafl<N> {
         }
 
         let side_string = match self.state.side {
-            1 => "Attacker",
-            2 => "Defender",
-            _ => "",
+            Side::Attacker => "Attacker",
+            Side::Defender => "Defender",
         };
         write!(f, "Turn: {}", side_string)?;
         write!(f, "{}", '\n')?;
@@ -117,15 +114,17 @@ impl<const N: usize> State<N> {
     // }
 
     fn switch_side(&mut self) -> () {
-        self.side = 3 - self.side;
+        self.side = match self.side {
+            Side::Attacker => Side::Defender,
+            Side::Defender => Side::Attacker,
+        };
     }
 
     fn move_piece(&self, start_idx: usize, end_idx: usize) -> Result<State<N>, String> {
         let start_tile = self.board[start_idx];
 
-        if self.side == 1 {
-            match start_tile {
-                // Attacker
+        match self.side {
+            Side::Attacker => match start_tile {
                 Tile::Empty => Err("Nothing on start position".to_string()),
                 Tile::Attacker => match self.validate_move(start_idx, end_idx) {
                     Ok(_) => Ok(self.next_state(start_idx, end_idx)),
@@ -135,11 +134,8 @@ impl<const N: usize> State<N> {
                 Tile::King => Err("Attacker cannot move King".to_string()),
                 Tile::Castle => Err("Cannot move from Castle".to_string()),
                 Tile::CastleWithKing => Err("Cannot move from Castle".to_string()),
-                
-            }
-        } else {
-            match start_tile {
-                // Defender
+            },
+            Side::Defender => match start_tile {
                 Tile::Empty => Err("Nothing on start position".to_string()),
                 Tile::Attacker => Err("Defender cannot move Attacker".to_string()),
                 Tile::Defender | Tile::King => match self.validate_move(start_idx, end_idx) {
@@ -148,8 +144,7 @@ impl<const N: usize> State<N> {
                 },
                 Tile::Castle => Err("Cannot move from Castle".to_string()),
                 Tile::CastleWithKing => Err("Cannot move from Castle".to_string()),
-             
-            }
+            },
         }
     }
 
@@ -259,18 +254,18 @@ impl<const N: usize> State<N> {
 
     fn is_same_side(&self, piece: Tile) -> bool {
         match piece {
-            Tile::Attacker => self.side == 1,
-            Tile::Defender => self.side == 2,
-            Tile::King => self.side == 2,
+            Tile::Attacker => self.side == Side::Attacker,
+            Tile::Defender => self.side == Side::Defender,
+            Tile::King => self.side == Side::Defender,
             _ => false,
         }
     }
 
     fn is_opposite_side(&self, piece: Tile) -> bool {
         match piece {
-            Tile::Attacker => self.side != 1,
-            Tile::Defender => self.side != 2,
-            Tile::King => self.side != 2,
+            Tile::Attacker => self.side != Side::Attacker,
+            Tile::Defender => self.side != Side::Defender,
+            Tile::King => self.side != Side::Defender,
             _ => false,
         }
     }
@@ -293,6 +288,7 @@ enum Tile {
 //     }
 // }
 
+#[derive(Clone, Copy, Debug, PartialEq)]
 enum Side {
     Attacker,
     Defender,
