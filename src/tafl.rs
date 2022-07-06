@@ -228,8 +228,8 @@ impl<const N: usize> State<N> {
         //left
         let index = end_idx - 2;
         if index > 0 && index / self.row_size == end_row {
-            if self.is_same_side(clone.board[index])
-                && self.is_opposite_side(clone.board[index + 1])
+            if self.side.tile_is_same_side(clone.board[index])
+                && self.side.tile_is_opposite_side(clone.board[index + 1])
             {
                 clone.board[index + 1] = Tile::Empty;
             };
@@ -239,8 +239,8 @@ impl<const N: usize> State<N> {
         let index = end_idx + 2;
 
         if index < self.row_size * self.row_size && index / self.row_size == end_row {
-            if self.is_same_side(clone.board[index])
-                && self.is_opposite_side(clone.board[index - 1])
+            if self.side.tile_is_same_side(clone.board[index])
+                && self.side.tile_is_opposite_side(clone.board[index - 1])
             {
                 clone.board[index - 1] = Tile::Empty;
             }
@@ -251,29 +251,11 @@ impl<const N: usize> State<N> {
 
         clone
     }
-
-    fn is_same_side(&self, piece: Tile) -> bool {
-        match piece {
-            Tile::Attacker => self.side == Side::Attacker,
-            Tile::Defender => self.side == Side::Defender,
-            Tile::King => self.side == Side::Defender,
-            _ => false,
-        }
-    }
-
-    fn is_opposite_side(&self, piece: Tile) -> bool {
-        match piece {
-            Tile::Attacker => self.side != Side::Attacker,
-            Tile::Defender => self.side != Side::Defender,
-            Tile::King => self.side != Side::Defender,
-            _ => false,
-        }
-    }
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 
-enum Tile {
+pub enum Tile {
     Attacker,
     Defender,
     King,
@@ -282,14 +264,29 @@ enum Tile {
     CastleWithKing,
 }
 
-// impl Tile {
-//     fn is_empty(&self) -> bool {
-//         self == Tile::Empty
-//     }
-// }
+impl Tile {
+    pub fn is_empty(&self) -> bool {
+        *self == Tile::Empty
+    }
+}
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 enum Side {
     Attacker,
     Defender,
+}
+
+impl Side {
+    fn tile_is_same_side(&self, tile: Tile) -> bool {
+        match tile {
+            Tile::Attacker => *self == Side::Attacker,
+            Tile::Defender => *self == Side::Defender,
+            Tile::King => *self == Side::Defender,
+            _ => false,
+        }
+    }
+
+    fn tile_is_opposite_side(&self , tile: Tile) -> bool {
+        !self.tile_is_same_side(tile)
+    }
 }

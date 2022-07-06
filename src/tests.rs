@@ -162,6 +162,11 @@ mod tests {
         
     }
 
+    #[test]
+    fn tile_is_empty() {
+        assert_eq!(crate::tafl::Tile::Empty.is_empty() , true);
+        assert_eq!(crate::tafl::Tile::King.is_empty() , false);
+    }
 
 
 
