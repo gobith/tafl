@@ -146,6 +146,36 @@ mod tests {
         
     }
 
+
+    #[test]
+    fn tfl_test_move_piece_capture_up() {
+        let mut tfl = crate::tafl::brandubh();
+        println!("{}", tfl);
+        tfl.move_piece(4 , 18);
+        println!("{}", tfl);
+        tfl.move_piece(23 , 16);
+        println!("{}", tfl);
+        tfl.move_piece(46 , 32);
+        println!("{}", tfl);
+        println!("{:?}", tfl);
+        
+    }
+
+    #[test]
+    fn tfl_test_move_piece_capture_down() {
+        let mut tfl = crate::tafl::brandubh();
+        println!("{}", tfl);
+        tfl.move_piece(46 , 32);
+        println!("{}", tfl);
+        tfl.move_piece(23 , 16);
+        println!("{}", tfl);
+        tfl.move_piece(4 , 18);
+        println!("{}", tfl);
+        println!("{:?}", tfl);
+        
+    }
+
+
     #[test]
     fn tfl_test_move_wrong_piece() {
         let mut tfl = crate::tafl::brandubh();

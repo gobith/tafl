@@ -247,7 +247,29 @@ impl<const N: usize> State<N> {
         };
 
         //up
+        let index = end_idx - (self.row_size * 2);
+        if index > 0 {
+            if self.side.tile_is_same_side(clone.board[index])
+                && self
+                    .side
+                    .tile_is_opposite_side(clone.board[index + self.row_size])
+            {
+                clone.board[index + self.row_size] = Tile::Empty;
+            };
+        };
+
         //down
+
+        let index = end_idx + (self.row_size * 2);
+        if index < self.row_size * self.row_size {
+            if self.side.tile_is_same_side(clone.board[index])
+                && self
+                    .side
+                    .tile_is_opposite_side(clone.board[index - self.row_size])
+            {
+                clone.board[index - self.row_size] = Tile::Empty;
+            };
+        };
 
         clone
     }
@@ -286,7 +308,7 @@ impl Side {
         }
     }
 
-    fn tile_is_opposite_side(&self , tile: Tile) -> bool {
+    fn tile_is_opposite_side(&self, tile: Tile) -> bool {
         !self.tile_is_same_side(tile)
     }
 }
